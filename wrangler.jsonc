@@ -1,0 +1,16 @@
+{
+	"compatibility_date": "2025-10-08",
+	"main": "src/index.ts",
+	"name": "work-logger-app",
+	"upload_source_maps": true,
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "work_logger_db",
+			"database_id": "ff43a0ca-e87a-48bb-8aac-e13a1b76183b"
+		}
+	]
+}
