@@ -1,8 +1,8 @@
-import { ApiException, fromHono } from "chanfana";
+import { fromHono, ApiException } from "chanfana";
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 
-import { usersRouter } from "./endpoints/users/router";
+import { createUser } from "./endpoints/users/createUser";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -15,12 +15,8 @@ app.onError((err, c) => {
   }
 
   console.error(err);
-
   return c.json(
-    {
-      success: false,
-      errors: [{ code: 7000, message: "Internal Server Error" }],
-    },
+    { success: false, errors: [{ code: 7000, message: "Internal error" }] },
     500
   );
 });
@@ -29,12 +25,13 @@ const openapi = fromHono(app, {
   docs_url: "/",
   schema: {
     info: {
-      title: "Work Logger API",
+      title: "Secure Work Logging & Invoicing API",
       version: "1.0.0",
     },
   },
 });
 
-openapi.route("/users", usersRouter);
+// 🔥 THIS LINE IS WHY YOUR SPEC WAS EMPTY
+openapi.route("/", createUser);
 
 export default app;
