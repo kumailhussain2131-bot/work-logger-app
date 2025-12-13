@@ -1,11 +1,12 @@
 import { fromHono } from "chanfana";
 import { Hono } from "hono";
 
-const router = new Hono();
+const router = new Hono<{ Bindings: Env }>();
+
 export const usersRouter = fromHono(router);
 
 // Create user
-usersRouter.post("/create", async (c) => {
+router.post("/create", async (c) => {
   const body = await c.req.json<{
     name: string;
     profession: string;
@@ -13,9 +14,15 @@ usersRouter.post("/create", async (c) => {
     client: string;
   }>();
 
+  if (!body.name || !body.rate_per_hour) {
+    return c.json({ success: false, message: "Invalid data" }, 400);
+  }
+
   const result = await c.env.DB.prepare(
-    `INSERT INTO users (name, profession, rate_per_hour, client)
-     VALUES (?, ?, ?, ?)`
+    `
+    INSERT INTO users (name, profession, rate_per_hour, client)
+    VALUES (?, ?, ?, ?)
+    `
   )
     .bind(
       body.name,
