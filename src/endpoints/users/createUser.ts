@@ -4,9 +4,9 @@ import type { AppContext } from "../../types";
 
 export const createUser = createRoute({
   method: "post",
-  path: "/create",
+  path: "/users/create",
   tags: ["Users"],
-  summary: "Create a user",
+  summary: "Create user",
 
   request: {
     body: {
