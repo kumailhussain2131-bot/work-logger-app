@@ -1,13 +1,10 @@
-import { z } from "zod";
 import { createRoute } from "chanfana";
-import type { AppContext } from "../../types";
+import { z } from "zod";
 
 export const createUser = createRoute({
   method: "post",
   path: "/users/create",
-  tags: ["Users"],
-  summary: "Create user",
-
+  summary: "Create a user",
   request: {
     body: {
       content: {
@@ -22,7 +19,6 @@ export const createUser = createRoute({
       },
     },
   },
-
   responses: {
     200: {
       description: "User created",
@@ -36,8 +32,7 @@ export const createUser = createRoute({
       },
     },
   },
-
-  handler: async (c: AppContext) => {
+  handler: async (c) => {
     const body = await c.req.json();
 
     const result = await c.env.DB.prepare(
