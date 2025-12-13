@@ -1,6 +1,8 @@
+import { fromHono } from "chanfana";
 import { Hono } from "hono";
 
-export const workSessionsRouter = new Hono();
+const router = new Hono();
+export const usersRouter = fromHono(router);
 
 // Book ON
 workSessionsRouter.post("/book-on", async (c) => {
