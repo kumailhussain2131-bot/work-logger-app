@@ -1,6 +1,8 @@
+import { fromHono } from "chanfana";
 import { Hono } from "hono";
 
-export const usersRouter = new Hono();
+const router = new Hono();
+export const usersRouter = fromHono(router);
 
 // Create user
 usersRouter.post("/create", async (c) => {
