@@ -4,7 +4,7 @@ import { tasksRouter } from "./endpoints/tasks/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 
-import { usersRouter } from "./endpoints/users/routers";
+import { usersRouter } from "./endpoints/users/router";
 import { workSessionsRouter } from "./endpoints/workSessions/router";
 
 // Start a Hono app
