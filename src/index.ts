@@ -1,9 +1,7 @@
-title: "THIS SHOULD CHANGE OR DEPLOY IS BROKEN",
-import { fromHono, ApiException } from "chanfana";
+import { ApiException, fromHono } from "chanfana";
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-
-import { createUser } from "./endpoints/users/createUser";
+import { usersRoutes } from "./endpoints/users";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -17,7 +15,7 @@ app.onError((err, c) => {
 
   console.error(err);
   return c.json(
-    { success: false, errors: [{ code: 7000, message: "Internal error" }] },
+    { success: false, errors: [{ message: "Internal Server Error" }] },
     500
   );
 });
@@ -26,13 +24,15 @@ const openapi = fromHono(app, {
   docs_url: "/",
   schema: {
     info: {
-      title: "Secure Work Logging & Invoicing API",
+      title: "Secure Work Logger API",
       version: "1.0.0",
     },
   },
 });
 
-// 🔥 THIS LINE IS WHY YOUR SPEC WAS EMPTY
-openapi.route("/", createUser);
+// register ALL user routes
+for (const route of usersRoutes) {
+  openapi.route("/", route);
+}
 
 export default app;
