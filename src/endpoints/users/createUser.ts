@@ -1,55 +1,48 @@
-import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
+import { createRoute } from "chanfana";
+import type { AppContext } from "../../types";
 
-export class CreateUser extends OpenAPIRoute {
-  static schema = {
-    tags: ["Users"],
-    summary: "Create a user",
-    request: {
-      body: {
-        content: {
-          "application/json": {
-            schema: z.object({
-              name: z.string(),
-              profession: z.string(),
-              rate_per_hour: z.number(),
-              client: z.string(),
-            }),
-          },
+export const createUser = createRoute({
+  method: "post",
+  path: "/create",
+  tags: ["Users"],
+  summary: "Create a user",
+
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            name: z.string(),
+            profession: z.string(),
+            rate_per_hour: z.number(),
+            client: z.string(),
+          }),
         },
       },
     },
-    responses: {
-      200: {
-        description: "User created successfully",
-      },
-      400: {
-        description: "Invalid input",
+  },
+
+  responses: {
+    200: {
+      description: "User created",
+      content: {
+        "application/json": {
+          schema: z.object({
+            success: z.boolean(),
+            user_id: z.number(),
+          }),
+        },
       },
     },
-  };
+  },
 
-  async handle(c: any) {
-    const body = await c.req.json<{
-      name: string;
-      profession: string;
-      rate_per_hour: number;
-      client: string;
-    }>();
-
-    // Basic validation (don’t trust clients)
-    if (!body.name || !body.rate_per_hour) {
-      return c.json(
-        { success: false, message: "Missing required fields" },
-        400
-      );
-    }
+  handler: async (c: AppContext) => {
+    const body = await c.req.json();
 
     const result = await c.env.DB.prepare(
-      `
-      INSERT INTO users (name, profession, rate_per_hour, client)
-      VALUES (?, ?, ?, ?)
-      `
+      `INSERT INTO users (name, profession, rate_per_hour, client)
+       VALUES (?, ?, ?, ?)`
     )
       .bind(
         body.name,
@@ -63,5 +56,5 @@ export class CreateUser extends OpenAPIRoute {
       success: true,
       user_id: result.meta.last_row_id,
     });
-  }
-}
+  },
+});
