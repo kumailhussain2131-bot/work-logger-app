@@ -1,56 +1,43 @@
 import { ApiException, fromHono } from "chanfana";
 import { Hono } from "hono";
-import { tasksRouter } from "./endpoints/tasks/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 
 import { usersRouter } from "./endpoints/users/router";
 import { workSessionsRouter } from "./endpoints/workSessions/router";
 
-// Start a Hono app
+// Start app
 const app = new Hono<{ Bindings: Env }>();
 
+// Global error handler
 app.onError((err, c) => {
-	if (err instanceof ApiException) {
-		// If it's a Chanfana ApiException, let Chanfana handle the response
-		return c.json(
-			{ success: false, errors: err.buildResponse() },
-			err.status as ContentfulStatusCode,
-		);
-	}
+  if (err instanceof ApiException) {
+    return c.json(
+      { success: false, errors: err.buildResponse() },
+      err.status as ContentfulStatusCode
+    );
+  }
 
-	console.error("Global error handler caught:", err); // Log the error if it's not known
-
-	// For other errors, return a generic 500 response
-	return c.json(
-		{
-			success: false,
-			errors: [{ code: 7000, message: "Internal Server Error" }],
-		},
-		500,
-	);
+  console.error(err);
+  return c.json(
+    { success: false, message: "Internal Server Error" },
+    500
+  );
 });
 
-// Setup OpenAPI registry
+// OpenAPI setup (Swagger)
 const openapi = fromHono(app, {
-	docs_url: "/",
-	schema: {
-		info: {
-			title: "My Awesome API",
-			version: "2.0.0",
-			description: "This is the documentation for my awesome API.",
-		},
-	},
+  docs_url: "/", // Swagger at root
+  schema: {
+    info: {
+      title: "Work Logger API",
+      version: "1.0.0",
+      description: "Secure backend for work logging & invoicing",
+    },
+  },
 });
 
+// Register routes
 openapi.route("/users", usersRouter);
 openapi.route("/work-sessions", workSessionsRouter);
 
-// Register Tasks Sub router
-openapi.route("/tasks", tasksRouter);
-
-// Register other endpoints
-openapi.post("/dummy/:slug", DummyEndpoint);
-
-// Export the Hono app
 export default app;
