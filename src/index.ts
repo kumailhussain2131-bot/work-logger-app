@@ -4,6 +4,9 @@ import { tasksRouter } from "./endpoints/tasks/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
 
+import { usersRouter } from "./endpoints/users/router";
+import { workSessionsRouter } from "./endpoints/workSessions/router";
+
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
 
@@ -39,6 +42,9 @@ const openapi = fromHono(app, {
 		},
 	},
 });
+
+openapi.route("/users", usersRouter);
+openapi.route("/work-sessions", workSessionsRouter);
 
 // Register Tasks Sub router
 openapi.route("/tasks", tasksRouter);
