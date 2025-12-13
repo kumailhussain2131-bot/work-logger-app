@@ -1,3 +1,4 @@
+title: "THIS SHOULD CHANGE OR DEPLOY IS BROKEN",
 import { fromHono, ApiException } from "chanfana";
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
