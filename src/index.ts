@@ -6,6 +6,9 @@ import { apiKeyAuth } from "./middleware/auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
+// 🔐 AUTH MUST BE HERE (ON app)
+app.use("*", apiKeyAuth);
+
 app.onError((err, c) => {
   if (err instanceof ApiException) {
     return c.json(
@@ -31,10 +34,9 @@ const openapi = fromHono(app, {
   },
 });
 
-// ✅ APPLY AUTH MIDDLEWARE HERE
-openapi.use("*", apiKeyAuth);
+// ❌ DO NOT put middleware here
+// openapi.use("*", apiKeyAuth);  ← DELETE THIS
 
-// register ALL user routes
 for (const route of usersRoutes) {
   openapi.route("/", route);
 }
