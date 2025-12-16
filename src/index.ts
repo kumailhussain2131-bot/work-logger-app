@@ -2,6 +2,7 @@ import { ApiException, fromHono } from "chanfana";
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { usersRoutes } from "./endpoints/users";
+import { apiKeyAuth } from "./middleware/auth";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -29,6 +30,9 @@ const openapi = fromHono(app, {
     },
   },
 });
+
+// ✅ APPLY AUTH MIDDLEWARE HERE
+openapi.use("*", apiKeyAuth);
 
 // register ALL user routes
 for (const route of usersRoutes) {
