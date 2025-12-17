@@ -1,14 +1,17 @@
 import { Hono } from "hono";
 import { apiKeyAuth } from "./middleware/auth";
+import { usersRoutes } from "./endpoints/users";
 
 const app = new Hono();
 
-// 🔒 Secure everything
+// 🔒 Global API security
 app.use("*", apiKeyAuth);
 
-// Health check (still protected)
-app.get("/health", (c) => {
-  return c.json({ status: "ok" });
-});
+// Register routes
+for (const route of usersRoutes) {
+  app.route("/", route);
+}
+
+app.get("/health", (c) => c.json({ status: "ok" }));
 
 export default app;
