@@ -1,10 +1,10 @@
-import { Context, Next } from "hono";
+import type { Context, Next } from "hono";
 
 export const apiKeyAuth = async (c: Context, next: Next) => {
   return c.json(
     {
-      message: "AUTH MIDDLEWARE IS RUNNING",
-      authorizationHeader: c.req.header("authorization") ?? null,
+      message: "AUTH MIDDLEWARE HIT",
+      header: c.req.header("authorization") ?? "none",
     },
     418
   );
