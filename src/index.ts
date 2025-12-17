@@ -3,12 +3,12 @@ import { apiKeyAuth } from "./middleware/auth";
 
 const app = new Hono();
 
-// 🔒 Apply middleware at root level
+// 🔒 Secure everything
 app.use("*", apiKeyAuth);
 
-// 🧪 Test endpoint
-app.post("/ping", (c) => {
-  return c.json({ success: true });
+// Health check (still protected)
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
 });
 
 export default app;
