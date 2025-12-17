@@ -1,55 +1,35 @@
-import { createRoute } from "chanfana";
-import { z } from "zod";
+import { Hono } from "hono";
 
-export const createUser = createRoute({
-  method: "post",
-  path: "/users/create",
-  summary: "Create a user",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: z.object({
-            name: z.string(),
-            profession: z.string(),
-            rate_per_hour: z.number(),
-            client: z.string(),
-          }),
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "User created",
-      content: {
-        "application/json": {
-          schema: z.object({
-            success: z.boolean(),
-            user_id: z.number(),
-          }),
-        },
-      },
-    },
-  },
-  handler: async (c) => {
-    const body = await c.req.json();
+export const createUser = new Hono();
 
-    const result = await c.env.DB.prepare(
-      `INSERT INTO users (name, profession, rate_per_hour, client)
-       VALUES (?, ?, ?, ?)`
+createUser.post("/users/create", async (c) => {
+  const body = await c.req.json<{
+    name: string;
+    profession: string;
+    rate_per_hour: number;
+    client: string;
+  }>();
+
+  if (!body.name || !body.rate_per_hour) {
+    return c.json({ error: "Missing required fields" }, 400);
+  }
+
+  const result = await c.env.DB.prepare(
+    `
+    INSERT INTO users (name, profession, rate_per_hour, client, created_at)
+    VALUES (?, ?, ?, ?, datetime('now'))
+    `
+  )
+    .bind(
+      body.name,
+      body.profession ?? "",
+      body.rate_per_hour,
+      body.client ?? ""
     )
-      .bind(
-        body.name,
-        body.profession,
-        body.rate_per_hour,
-        body.client
-      )
-      .run();
+    .run();
 
-    return c.json({
-      success: true,
-      user_id: result.meta.last_row_id,
-    });
-  },
+  return c.json({
+    success: true,
+    user_id: result.meta.last_row_id,
+  });
 });
