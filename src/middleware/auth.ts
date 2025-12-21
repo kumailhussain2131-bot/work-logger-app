@@ -1,16 +1,16 @@
-import type { Context, Next } from "hono";
+import { MiddlewareHandler } from "hono";
 
-export const apiKeyAuth = async (c: Context, next: Next) => {
-  const authHeader = c.req.header("authorization");
+export const apiKeyAuth: MiddlewareHandler = async (c, next) => {
+  const auth = c.req.header("Authorization");
 
-  if (!authHeader) {
+  if (!auth) {
     return c.json({ error: "Missing Authorization header" }, 401);
   }
 
-  const token = authHeader.replace("Bearer ", "").trim();
+  const token = auth.replace("Bearer ", "");
 
-  if (!c.env || token !== c.env.API_KEY) {
-    return c.json({ error: "Invalid API key" }, 401);
+  if (token !== c.env.API_KEY) {
+    return c.json({ error: "Invalid API key" }, 403);
   }
 
   await next();
