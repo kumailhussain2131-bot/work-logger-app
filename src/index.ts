@@ -4,7 +4,7 @@ import { usersRoutes } from "./endpoints/users";
 
 const app = new Hono();
 
-// 🔒 Global API security
+// 🔒 PROTECT EVERYTHING
 app.use("*", apiKeyAuth);
 
 // Register routes
